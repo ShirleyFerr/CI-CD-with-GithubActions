@@ -1,0 +1,33 @@
+name: CD - Deploy to EC2
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  deploy:
+    name: Deploy to EC2
+    runs-on: self-hosted
+    
+    steps:
+      - name: Pull latest Docker image
+        run: docker pull ${{ secrets.DOCKERHUB_USERNAME }}/actions:latest
+      
+      - name: Stop running container
+        run: docker stop actions-app || true
+      
+      - name: Remove old container
+        run: docker rm actions-app || true
+      
+      - name: Run new container
+        run: |
+          docker run -d \
+            --name actions-app \
+            -p 8080:8080 \
+            ${{ secrets.DOCKERHUB_USERNAME }}/actions:latest
+      
+      - name: Wait for application to start
+        run: sleep 10
+      
+      - name: Verify deployment
+        run: curl http://localhost:8080/actuator/health || echo "Health check endpoint not available"
