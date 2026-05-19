@@ -1,13 +1,17 @@
 name: CD - Deploy to EC2
 
 on:
-  push:
+  workflow_run:
+    workflows: ["CI - Build and Test"]
+    types:
+      - completed
     branches: [ main ]
 
 jobs:
   deploy:
     name: Deploy to EC2
     runs-on: self-hosted
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     
     steps:
       - name: Pull latest Docker image
