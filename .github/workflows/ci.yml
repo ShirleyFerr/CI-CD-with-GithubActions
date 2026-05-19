@@ -23,7 +23,7 @@ jobs:
           cache: maven
       
       - name: Compile project
-        run: ./mvnw clean compile
+        run: cd actions/actions && ./mvnw clean compile
 
   test:
     name: Test
@@ -42,7 +42,7 @@ jobs:
           cache: maven
       
       - name: Run tests
-        run: ./mvnw test
+        run: cd actions/actions && ./mvnw test
 
   docker:
     name: Build and Push Docker Image
@@ -65,7 +65,7 @@ jobs:
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
         with:
-          context: .
+          context: ./actions/actions
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/actions:latest
           cache-from: type=gha
